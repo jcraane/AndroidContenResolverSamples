@@ -52,15 +52,15 @@ class MainActivity : ComponentActivity() {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
                     Column() {
                         Button(onClick = {
-                            activityLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            viewModel.getTotalCount(contentResolver)
                         }) {
-                            Text("Query")
+                            Text("Total count")
                         }
 
                         Button(onClick = {
-
+                            activityLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         }) {
-                            Text("Download")
+                            Text("Query")
                         }
 
                         LazyColumn(
@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
                                 Row(
                                     modifier = Modifier.clickable(
                                         onClick = {
-                                            viewModel.download(this@MainActivity, contentResolver, mediaItem.uri)
+                                            viewModel.download(this@MainActivity, mediaItem.uri)
                                         },
                                     )
                                 ) {

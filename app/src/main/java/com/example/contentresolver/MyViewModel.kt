@@ -3,6 +3,7 @@ package com.example.contentresolver
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+
 
 class MyViewModel : ViewModel() {
     val mediaItems = MutableStateFlow<List<MediaItem>>(emptyList())
@@ -86,16 +88,38 @@ class MyViewModel : ViewModel() {
         }
     }
 
-    fun download(context: Context, contentResolver: ContentResolver, uri: Uri) {
+    fun download(context: Context, uri: Uri) {
         println("contentresolver: download")
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val file = File(context.getExternalFilesDir(null), "picture.jpg")
                 val fos = FileOutputStream(file)
                 println("contentresolver: download: ${file.absolutePath}")
-                contentResolver.openInputStream(uri)?.use {
+                context.contentResolver.openInputStream(uri)?.use {
                     println("contentresolver: copyTo")
                     it.copyTo(fos)
+                }
+            }
+        }
+    }
+
+    fun getTotalCount(contentResolver: ContentResolver) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val imageCountProjection = arrayOf(
+                    "count(${MediaStore.Images.ImageColumns._ID})"
+                )
+
+                contentResolver.query(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    imageCountProjection,
+                    null,
+                    null,
+                    null
+                )?.use { cursor ->
+                    cursor.moveToFirst()
+                    val existingImageCount = cursor.getInt(0)
+                    println("contentresolver: count = $existingImageCount")
                 }
             }
         }

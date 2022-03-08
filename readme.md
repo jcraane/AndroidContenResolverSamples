@@ -1,0 +1,1 @@
+Some example for working with content resolver in Android

@@ -1,35 +1,29 @@
 package com.example.contentresolver
 
 import android.Manifest
-import android.content.ContentResolver
-import android.content.ContentUris
-import android.content.pm.PackageManager
-import android.media.browse.MediaBrowser
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.app.ActivityCompat
-import androidx.core.database.getLongOrNull
-import androidx.core.database.getStringOrNull
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.contentresolver.ui.theme.ContentResolverTheme
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     val viewModel: MyViewModel by viewModels()
@@ -50,6 +44,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ContentResolverTheme {
+                val mediaItems by viewModel.mediaItems.collectAsState()
+
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
                     Column() {
@@ -57,6 +53,29 @@ class MainActivity : ComponentActivity() {
                             activityLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         }) {
                             Text("Query")
+                        }
+
+                        Button(onClick = {
+
+                        }) {
+                            Text("Download")
+                        }
+
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            mediaItems.forEach { mediaItem ->
+                                Row(
+                                    modifier = Modifier.clickable(
+                                        onClick = {
+                                            viewModel.download(this@MainActivity, contentResolver, mediaItem.uri)
+                                        },
+                                        )
+                                ) {
+                                    Text(text = mediaItem.uri.toString(), modifier = Modifier.weight(0.5f))
+                                    Text(text = mediaItem.size.toString(), modifier = Modifier.weight(0.5f))
+                                }
+                            }
                         }
                     }
                 }

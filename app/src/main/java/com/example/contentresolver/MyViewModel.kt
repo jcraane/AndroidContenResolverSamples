@@ -2,16 +2,23 @@ package com.example.contentresolver
 
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import androidx.core.database.getStringOrNull
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 
 class MyViewModel : ViewModel() {
+    val mediaItems = MutableStateFlow<List<MediaItem>>(emptyList())
+
     fun retrieveContent(contentResolver: ContentResolver) {
         viewModelScope.launch {
             println("contentresolver: about to query")
@@ -41,7 +48,7 @@ class MyViewModel : ViewModel() {
                     Bundle().apply {
                         // Limit & Offset
                         putInt(ContentResolver.QUERY_ARG_LIMIT, 5)
-                        putInt(ContentResolver.QUERY_ARG_OFFSET, 0)
+                        putInt(ContentResolver.QUERY_ARG_OFFSET, 20500)
                         // Sort function
                         putStringArray(
                             ContentResolver.QUERY_ARG_SORT_COLUMNS,
@@ -73,8 +80,23 @@ class MyViewModel : ViewModel() {
                 }
 
                 println("contentresolver: result = $uris")
+                mediaItems.value = uris
             }
         }
     }
 
+    fun download(context: Context, contentResolver: ContentResolver, uri: Uri) {
+        println("contentresolver: download")
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val file = File(context.getExternalFilesDir(null), "picture.jpg")
+                val fos = FileOutputStream(file)
+                println("contentresolver: download: ${file.absolutePath}")
+                contentResolver.openInputStream(uri)?.use {
+                    println("contentresolver: copyTo")
+                    it.copyTo(fos)
+                }
+            }
+        }
+    }
 }

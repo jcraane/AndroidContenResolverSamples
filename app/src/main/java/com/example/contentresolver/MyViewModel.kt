@@ -16,7 +16,6 @@ class MyViewModel : ViewModel() {
         viewModelScope.launch {
             println("contentresolver: about to query")
             withContext(Dispatchers.IO) {
-//            data or OWNER_PACKAGE_NAME
                 val projection = arrayOf(
                     MediaStore.Files.FileColumns._ID,
                     MediaStore.Files.FileColumns.DATA,
@@ -27,15 +26,15 @@ class MyViewModel : ViewModel() {
                     MediaStore.Video.Media.DURATION
                 )
 
+                /************ Crash when adding whereCondition and selectionArgs ***************/
                 val whereCondition = "${MediaStore.Files.FileColumns.MEDIA_TYPE} = ? OR ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
                 val selectionArgs = arrayOf(
                     MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
                     MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
                 )
+                /************ Crash when adding whereCondition and selectionArgs ***************/
 
                 val uris = mutableListOf<MediaItem>()
-//        todo this is for after Q
-                // todo offset should be remembered
                 contentResolver.query(
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     projection,

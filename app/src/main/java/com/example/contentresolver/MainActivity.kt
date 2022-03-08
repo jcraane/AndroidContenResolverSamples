@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -61,16 +63,16 @@ class MainActivity : ComponentActivity() {
                             Text("Download")
                         }
 
-                        Column(
+                        LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            mediaItems.forEach { mediaItem ->
+                            items(mediaItems) { mediaItem ->
                                 Row(
                                     modifier = Modifier.clickable(
                                         onClick = {
                                             viewModel.download(this@MainActivity, contentResolver, mediaItem.uri)
                                         },
-                                        )
+                                    )
                                 ) {
                                     Text(text = mediaItem.uri.toString(), modifier = Modifier.weight(0.5f))
                                     Text(text = mediaItem.size.toString(), modifier = Modifier.weight(0.5f))

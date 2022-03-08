@@ -41,14 +41,15 @@ class MyViewModel : ViewModel() {
                 )
                 /************ Crash when adding whereCondition and selectionArgs ***************/
 
+                // 46941
                 val uris = mutableListOf<MediaItem>()
                 contentResolver.query(
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     projection,
                     Bundle().apply {
                         // Limit & Offset
-                        putInt(ContentResolver.QUERY_ARG_LIMIT, 5)
-                        putInt(ContentResolver.QUERY_ARG_OFFSET, 20500)
+                        putInt(ContentResolver.QUERY_ARG_LIMIT, 1000)
+                        putInt(ContentResolver.QUERY_ARG_OFFSET, 0)
                         // Sort function
                         putStringArray(
                             ContentResolver.QUERY_ARG_SORT_COLUMNS,

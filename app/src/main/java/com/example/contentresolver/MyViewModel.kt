@@ -18,11 +18,11 @@ class MyViewModel : ViewModel() {
             withContext(Dispatchers.IO) {
                 val projection = arrayOf(
                     MediaStore.Files.FileColumns._ID,
-                    MediaStore.Files.FileColumns.DATA,
+                    MediaStore.Files.FileColumns.OWNER_PACKAGE_NAME,
                     MediaStore.Files.FileColumns.DATE_ADDED,
-                    MediaStore.Files.FileColumns.MEDIA_TYPE,
                     MediaStore.Files.FileColumns.MIME_TYPE,
                     MediaStore.Files.FileColumns.TITLE,
+                    MediaStore.Files.FileColumns.SIZE,
                     MediaStore.Video.Media.DURATION
                 )
 
@@ -51,8 +51,8 @@ class MyViewModel : ViewModel() {
                             ContentResolver.QUERY_ARG_SORT_DIRECTION,
                             ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
                         )
-                        putString(ContentResolver.QUERY_ARG_SQL_SELECTION, whereCondition)
-                        putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs)
+//                        putString(ContentResolver.QUERY_ARG_SQL_SELECTION, whereCondition)
+//                        putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs)
                     },
                     null
                 )?.use { cursor ->

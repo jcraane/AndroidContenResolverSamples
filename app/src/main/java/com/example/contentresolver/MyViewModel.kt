@@ -51,8 +51,8 @@ class MyViewModel : ViewModel() {
                             ContentResolver.QUERY_ARG_SORT_DIRECTION,
                             ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
                         )
-//                        putString(ContentResolver.QUERY_ARG_SQL_SELECTION, whereCondition)
-//                        putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs)
+                        putString(ContentResolver.QUERY_ARG_SQL_SELECTION, whereCondition)
+                        putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs)
                     },
                     null
                 )?.use { cursor ->

@@ -3,13 +3,17 @@ package com.example.contentresolver
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import androidx.core.database.getStringOrNull
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.contentresolver.workmanager.QueryWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -20,6 +24,8 @@ import java.io.FileOutputStream
 
 class MyViewModel : ViewModel() {
     val mediaItems = MutableStateFlow<List<MediaItem>>(emptyList())
+
+    val totalNumberOfUris = MutableStateFlow<Int>(0)
 
     fun retrieveContent(contentResolver: ContentResolver) {
         viewModelScope.launch {
@@ -120,6 +126,51 @@ class MyViewModel : ViewModel() {
                     cursor.moveToFirst()
                     val existingImageCount = cursor.getInt(0)
                     println("contentresolver: count = $existingImageCount")
+                }
+            }
+        }
+    }
+
+    fun queryUsingWorkManager(applicationContext: Context, lifecycleOwner: LifecycleOwner) {
+        val queryRequest = OneTimeWorkRequestBuilder<QueryWorker>()
+            .addTag("query")
+            .build()
+        val workManager = WorkManager.getInstance(applicationContext)
+        workManager.beginUniqueWork("query", ExistingWorkPolicy.REPLACE, queryRequest)
+            .enqueue()
+
+        workManager.getWorkInfosByTagLiveData("query").observe(lifecycleOwner) { workInfos ->
+            println("workInfo received: $workInfos")
+
+/*
+            workInfos.forEach { workInfo ->
+                val value = workInfo.outputData.getInt(QueryWorker.KEY_MEDIA_ITEMS, -1)
+                println("value received = $value")
+                if (value != -1) {
+                    totalNumberOfUris.value = value
+                }
+            }
+*/
+
+
+/*
+            workInfos?.find { it.tags.contains("query") }?.let { workInfo ->
+                val value = workInfo.outputData.getInt(QueryWorker.KEY_MEDIA_ITEMS, -1)
+                println("value received = $value")
+                if (value != -1) {
+                    totalNumberOfUris.value = value
+                }
+            }
+*/
+        }
+
+        workManager.getWorkInfosForUniqueWorkLiveData("query").observe(lifecycleOwner) { workInfos ->
+            println("workInfo received: $workInfos")
+            workInfos?.find { it.id == queryRequest.id }?.let { workInfo ->
+                val value = workInfo.outputData.getInt(QueryWorker.KEY_MEDIA_ITEMS, -1)
+                println("value received = $value")
+                if (value != -1) {
+                    totalNumberOfUris.value = value
                 }
             }
         }

@@ -32,11 +32,12 @@ class MyViewModel : ViewModel() {
                     MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
                     MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
                 )
+
                 /************ Crash when adding whereCondition and selectionArgs ***************/
 
                 val uris = mutableListOf<MediaItem>()
                 contentResolver.query(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    MediaStore.Files.getContentUri("external"),
                     projection,
                     Bundle().apply {
                         // Limit & Offset
